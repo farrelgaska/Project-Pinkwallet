@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinkWallet – Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon">💳</div><div class="logo-text"><h2>PinkWallet</h2><p>Track smarter, spend better</p></div></div>
+  <div class="nav-label">Menu</div>
+  <div class="nav-item active" data-page="dashboard" onclick="showPage(this,'dashboard')"><div class="nav-icon">📊</div> Dashboard</div>
+  <div class="nav-item" data-page="transactions" onclick="showPage(this,'transactions')"><div class="nav-icon">💸</div> Transactions</div>
+  <div class="nav-item" data-page="budget" onclick="showPage(this,'budget')"><div class="nav-icon">📋</div> Budget</div>
+  <div class="nav-item" data-page="reports" onclick="showPage(this,'reports')"><div class="nav-icon">📈</div> Reports</div>
+  <div class="nav-item" data-page="settings" onclick="showPage(this,'settings')"><div class="nav-icon">⚙️</div> Settings</div>
+  <div class="sidebar-footer"><div class="sf-icon">✨</div><h4>Upgrade your budgeting habit</h4><p>Unlock advanced insights and personalised tips.</p><button class="sf-btn" onclick="showModal('Budget Tips','Catat transaksi setiap hari, pisahkan kebutuhan dan keinginan, lalu review pengeluaran setiap minggu.','✨')">View Tips</button></div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h1 id="pageTitle">Hi, Farrel 👋</h1><p id="pageSubtitle">Here is your financial overview for this month</p></div>
+    <div class="topbar-right"><div class="search-box"><span class="search-icon">🔍</span><input id="searchInput" type="text" placeholder="Search transactions..."></div><div class="icon-btn" onclick="showModal('Notification','Budget kamu hampir menyentuh limit bulanan. Dompet sedang minta pertolongan.','🔔')">🔔<span class="badge"></span></div><div class="avatar" id="avatarInitial">F</div></div>
+  </div>
+
+  <section class="page active" id="dashboardPage">
+    <div class="stats-row">
+      <div class="stat-card balance"><div class="stat-top"><div class="stat-icon">💰</div><span class="stat-badge up">Live</span></div><div class="stat-label">Total Balance</div><div class="stat-value" id="balanceVal">Rp0</div></div>
+      <div class="stat-card income"><div class="stat-top"><div class="stat-icon">📥</div><span class="stat-badge up">Income</span></div><div class="stat-label">Monthly Income</div><div class="stat-value" id="incomeVal">Rp0</div></div>
+      <div class="stat-card expense"><div class="stat-top"><div class="stat-icon">📤</div><span class="stat-badge down">Expense</span></div><div class="stat-label">Monthly Expense</div><div class="stat-value" id="expenseVal">Rp0</div></div>
+    </div>
+    <div class="content-grid">
+      <div class="left-col">
+        <div class="chart-card"><div class="card-header"><div><div class="card-title">Monthly Spending Overview</div><div class="card-sub">Your expense trend this month</div></div><div class="tab-group"><div class="tab" onclick="switchTab(this,'weekly')">Weekly</div><div class="tab active" onclick="switchTab(this,'monthly')">Monthly</div><div class="tab" onclick="switchTab(this,'yearly')">Yearly</div></div></div><div class="chart-wrap"><canvas id="spendingChart"></canvas></div></div>
+        <div class="txn-card"><div class="card-header"><div class="card-title">Recent Transactions</div><a class="view-all" onclick="showPageByName('transactions')">View All →</a></div><table class="txn-table"><thead><tr><th>Transaction</th><th>Category</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="txnBody"></tbody></table></div>
+      </div>
+      <div class="right-col">
+        <div class="quick-card"><div class="card-header"><div class="card-title">Add Transaction</div></div><div class="form-group" style="margin-bottom:10px;"><div class="form-label">Name</div><input class="form-control" type="text" placeholder="e.g. Dinner" id="txName"></div><div class="form-row"><div class="form-group"><div class="form-label">Type</div><select class="form-control" id="txType"><option>Expense</option><option>Income</option></select></div><div class="form-group"><div class="form-label">Category</div><select class="form-control" id="txCat"><option>Food</option><option>Transport</option><option>Shopping</option><option>Education</option><option>Entertainment</option><option>Income</option></select></div></div><div class="form-group"><div class="form-label">Amount</div><div class="amount-input"><span class="amount-prefix">Rp</span><input type="number" placeholder="0" id="txAmount" min="0"></div></div><button class="add-btn" onclick="addTransaction()">＋ Add Transaction</button></div>
+        <div class="alert-card"><div class="alert-top"><div class="alert-icon">⚠️</div><div><div class="alert-title">Budget Alert</div><div class="alert-sub" id="budgetSub">Budget usage calculated automatically.</div></div></div><div class="budget-bar-wrap"><div class="budget-labels"><span class="used" id="budgetUsed">Rp0</span><span class="total" id="budgetTotal">Rp0</span></div><div class="budget-bar"><div class="budget-fill" id="budgetFill"></div></div></div></div>
+        <div class="cats-card"><div class="card-header"><div class="card-title">Top Categories</div></div><div id="categoriesList"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="transactionsPage">
+    <div class="page-grid single">
+      <div class="txn-card"><div class="card-header"><div><div class="card-title">All Transactions</div><div class="card-sub">Filter, search, delete, and manage your money history.</div></div><div class="tab-group"><div class="tab active" onclick="filterTransactions(this,'All')">All</div><div class="tab" onclick="filterTransactions(this,'Income')">Income</div><div class="tab" onclick="filterTransactions(this,'Expense')">Expense</div></div></div><table class="txn-table"><thead><tr><th>Transaction</th><th>Category</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody id="allTxnBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="page" id="budgetPage">
+    <div class="page-grid">
+      <div class="quick-card"><div class="card-header"><div><div class="card-title">Set Monthly Budget</div><div class="card-sub">Atur limit tiap kategori. Ya, uang memang harus diawasi seperti anak magang.</div></div></div><div id="budgetForm"></div><button class="add-btn" onclick="saveBudget()">Save Budget</button></div>
+      <div class="cats-card"><div class="card-header"><div class="card-title">Budget Usage</div></div><div id="budgetList"></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="reportsPage">
+    <div class="stats-row"><div class="stat-card income"><div class="stat-label">Highest Income</div><div class="stat-value" id="reportIncome">Rp0</div></div><div class="stat-card expense"><div class="stat-label">Highest Expense</div><div class="stat-value" id="reportExpense">Rp0</div></div><div class="stat-card balance"><div class="stat-label">Most Used Category</div><div class="stat-value" id="reportCategory">-</div></div></div>
+    <div class="page-grid"><div class="chart-card"><div class="card-header"><div><div class="card-title">Report Chart</div><div class="card-sub">Income vs Expense by category</div></div><button class="sf-btn small" onclick="exportReport()">Export Report</button></div><div id="reportBars"></div></div><div class="txn-card"><div class="card-header"><div class="card-title">Report Summary</div></div><div id="reportSummary" class="report-summary"></div></div></div>
+  </section>
+
+  <section class="page" id="settingsPage">
+    <div class="settings-grid"><div class="quick-card"><div class="card-header"><div><div class="card-title">Profile Settings</div><div class="card-sub">Ubah nama, saldo awal, dan target budget.</div></div></div><div class="form-group"><div class="form-label">Name</div><input id="setName" class="form-control" type="text"></div><div class="form-group"><div class="form-label">Initial Balance</div><div class="amount-input"><span class="amount-prefix">Rp</span><input id="setBalance" type="number"></div></div><div class="form-group"><div class="form-label">Monthly Budget</div><div class="amount-input"><span class="amount-prefix">Rp</span><input id="setBudget" type="number"></div></div><button class="add-btn" onclick="saveSettings()">Save Settings</button></div><div class="alert-card"><div class="alert-top"><div class="alert-icon">🧹</div><div><div class="alert-title">Reset Data</div><div class="alert-sub">Menghapus data transaksi dan budget dari localStorage.</div></div></div><button class="danger-btn" onclick="resetData()">Reset All Data</button></div></div>
+  </section>
+</main>
+
+<div class="toast" id="toast">✅ <span id="toastMsg">Transaction added!</span></div>
+<div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-icon" id="modalIcon">✅</div><h3 id="modalTitle">Berhasil</h3><p id="modalMsg">Data berhasil diproses.</p><button onclick="closeModal()">OK</button></div></div>
+<script src="script.js"></script>
+</body>
+</html>
